@@ -1,0 +1,32 @@
+<head>
+  <title>example</title>
+</head>
+
+<body>
+  <h1>Welcome to Meteor!</h1>
+
+  {{> hello}}
+</body>
+
+<template name="hello">
+  <h3>Search</h3>
+  <input type="text"/>
+  
+  {{#with stats}}
+    {{#if params}}
+      <h3>Stats</h3>
+      <dl>
+        <dt>QTime</dt>
+        <dd>{{QTime}}</dd>
+      </dl>
+    {{/if}}
+  {{/with}}
+
+  <h3>Results ({{results.length}})</h3>
+    {{#each results}}
+      <dl>
+        <dt>Title</dt>
+        <dd>{{title_t}}</dd>
+      </dl>
+    {{/each}}
+</template>

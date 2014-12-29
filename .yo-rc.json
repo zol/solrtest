@@ -1,0 +1,8 @@
+{
+  "generator-meteor-package": {
+    "name": "solrtest",
+    "username": "percolate",
+    "fullname": "percolate:solrtest",
+    "upname": "Solrtest"
+  }
+}
