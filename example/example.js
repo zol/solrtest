@@ -32,32 +32,41 @@ if (Meteor.isClient) {
 
 if (Meteor.isServer) {
   Meteor.startup(function () {
-    if (Meteor.call('Solrtest.ping').status === 'OK') {
-      if (Packages.find().count() === 0) {
-        var data = JSON.parse(Assets.getText('packages.json'));
-        var records = [];
-
-        console.log('Loading ' + data.length + ' items');
-        data.forEach(function(item) {
-          // stick with the default schema solr ships with out of the box
-          var record = {
-            title_t: item.name,
-            description_t: ''
-          }
-        
-          if (record.latestVersion)
-            record.description_t = record.latestVersion.description;
-
-          record.id = Packages.insert(record);
-          records.push(record);
-        });
-        console.log('Finished loading package data into db.');
+    if (Packages.find().count() === 0) {
+      var data = JSON.parse(Assets.getText('packages.json'));
       
-        console.log('Loading data into solr...');
-        Meteor.call('Solrtest.deleteAll');
-        var result = Solrtest.wrapped['add'](records);
-        console.log('Finished loading data into solr...');
-      }
+      console.log('Loading ' + data.length + ' items into mongo');
+      data.forEach(function(item) {
+        // fixup data
+        if (item.latestVersion) {
+          item.latestVersion.published = 
+            new Date(item.latestVersion.published['$date']);
+        }
+        item.lastUpdated = new Date(item.lastUpdated['$date']);
+        delete item.metadata;
+        
+        // console.log(item);
+        Packages.insert(item);
+        
+        console.log('Finished loading package data into db.');
+      });
     };
-  });
+    
+    if (Meteor.call('Solrtest.ping').status === 'OK') {
+      console.log('Ensuring packages are indexed by solr');
+      var records = Packages.find().map(function(x) {
+        return {
+          id: x.name,
+          title_t: x.name,
+          description_t: x.latestVersion ? x.latestVersion.description : ''
+        }
+      });
+
+      var result = Solrtest.wrapped['add'](records);
+      console.log('Finished indexing into solr');
+      console.log(result);
+    } else {
+      console.error('Cannot ping solr server, is it installed and running?');
+    }
+ });
 }
