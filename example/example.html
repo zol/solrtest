@@ -16,8 +16,10 @@
     {{#if params}}
       <h3>Stats</h3>
       <dl>
-        <dt>QTime</dt>
+        <dt>Query Time</dt>
         <dd>{{QTime}}</dd>
+        <dt>Total Time</dt>
+        <dd>{{totalTime}}</dd>
       </dl>
     {{/if}}
   {{/with}}
@@ -25,8 +27,8 @@
   <h3>Results ({{results.length}})</h3>
     {{#each results}}
       <div>
-        <div><em>Name</em> {{title_t}}</div>
-        <div><em>Description</em> {{description_t}}</div>
+        <div><em>Name</em> {{{highlighted this.name}}}</div>
+        <div><em>Description</em> {{description}}</div>
       </div><br/>
     {{/each}}
 </template>

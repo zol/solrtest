@@ -10,12 +10,23 @@ if (Meteor.isClient) {
   
   Template.hello.helpers({
     results: function () { return results.get(); },
-    stats: function () { return stats.get(); }
+    stats: function () { return stats.get(); },
+    highlighted: function(string) {
+      var st = stats.get();
+      
+      if (st && st.params && st.params.q) {
+        var query = st.params.q;
+        return string.replace(query, '<b>' + query + '</b>');
+      } else {
+        return string;
+      }
+    }
   });
 
   Template.hello.events({
     'keyup input': function (event) {
       console.log('typed:' + event.target.value);
+      var start = new Date;
       Meteor.call('Solrtest.query', event.target.value, function(error, result) {
         if (error) {
           console.error(error);
@@ -23,7 +34,9 @@ if (Meteor.isClient) {
           stats.set({});
         } else {
           results.set(result.response.docs);
-          stats.set(result.responseHeader);
+          stats.set(_.extend(result.responseHeader, {
+            totalTime: new Date - start
+          }));
         }
       });
     }
@@ -57,12 +70,13 @@ if (Meteor.isServer) {
       var records = Packages.find().map(function(x) {
         return {
           id: x.name,
-          title_t: x.name,
-          description_t: x.latestVersion ? x.latestVersion.description : ''
+          name: x.name,
+          description: x.latestVersion ? x.latestVersion.description : ''
         }
       });
 
       var result = Solrtest.wrapped['add'](records);
+
       console.log('Finished indexing into solr');
       console.log(result);
     } else {

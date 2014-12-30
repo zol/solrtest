@@ -14,19 +14,37 @@ function logged(result) {
   return result;
 }
 
+// potentially should escape other crap too
+function escape(string) {
+  return string.replace(':', '\:');
+}
+
 Meteor.methods({
   'Solrtest.query': function(q) {
     // lucene query
-    // var query = Solrtest.client.createQuery().q({title_t : q}).start(0).rows(100);
+    // var query = Solrtest.client.createQuery().q({name : q}).start(0).rows(100);
     
-    // dismax query
-    var query = Solrtest.client.createQuery().q(q)
+    // edismax query
+    var query = Solrtest.client.createQuery().q(escape(q))
                 .edismax()
-                .qf({title_t : 3.0 , description_t : 0.5})
-                .mm(2) // not sure what this means
+                .qf({name : 1.0})
+                // .mm(2) // not sure what this means
                 .start(0)
                 .rows(100);
-          
+
+
+    // To do highlighting, you must construct the query by hand
+    // var query = {
+    //   q: q,
+    //   mm: 2,
+    //   defType: 'edismax',
+    //   qf: 'name^1',
+    //   start: 0,
+    //   rows: 10,
+    //   hl : true,
+    //  'hl.fl' : 'name'
+    // };
+     
     return logged(Solrtest.wrapped['search'](query));
   },
   'Solrtest.deleteAll': function() {
