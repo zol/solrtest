@@ -10,7 +10,7 @@ Npm.depends({"solr-client": "0.5.0"});
 Package.onUse(function(api) {
   api.versionsFrom('METEOR@1.0.2');
 
-  api.use([], ['client', 'server']);
+  api.use(['logging'], ['client', 'server']);
 
   api.addFiles(['solrtest-common.js']);
   api.addFiles(['solrtest-client.js'], 'client');

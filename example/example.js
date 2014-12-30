@@ -4,6 +4,10 @@ if (Meteor.isClient) {
   var results = new ReactiveVar([]);
   var stats = new ReactiveVar({});
 
+  Template.hello.rendered = function() {
+    $(this.find('input')).focus();
+  }
+  
   Template.hello.helpers({
     results: function () { return results.get(); },
     stats: function () { return stats.get(); }
@@ -28,35 +32,32 @@ if (Meteor.isClient) {
 
 if (Meteor.isServer) {
   Meteor.startup(function () {
-    if (Packages.find().count() === 0) {
-      var data = JSON.parse(Assets.getText('packages.json'));
-      var records = [];
-      console.log('Loading ' + data.length + ' items');
-      
-      data.forEach(function(item) {
-        // stick with the default schema solr ships with out of the box
-        var record = {
-          title_t: item.name,
-          description_t: ''
-        }
+    if (Meteor.call('Solrtest.ping').status === 'OK') {
+      if (Packages.find().count() === 0) {
+        var data = JSON.parse(Assets.getText('packages.json'));
+        var records = [];
+
+        console.log('Loading ' + data.length + ' items');
+        data.forEach(function(item) {
+          // stick with the default schema solr ships with out of the box
+          var record = {
+            title_t: item.name,
+            description_t: ''
+          }
         
-        if (record.latestVersion)
-          record.description_t = record.latestVersion.description;
+          if (record.latestVersion)
+            record.description_t = record.latestVersion.description;
 
-        record.id = Packages.insert(record);
-        records.push(record);
-      });
+          record.id = Packages.insert(record);
+          records.push(record);
+        });
+        console.log('Finished loading package data into db.');
       
-      console.log('Finished loading package data into db.');
-      
-      console.log('Loading data into solr...');
-      Solrtest.client.add(records, function(err,obj) {
-        if (err)
-          console.error('ERRROR indexing data');
-
-        console.log(arguments);
-        console.log('Finished loading package data into solr...');
-      });
-    }
+        console.log('Loading data into solr...');
+        Meteor.call('Solrtest.deleteAll');
+        var result = Solrtest.wrapped['add'](records);
+        console.log('Finished loading data into solr...');
+      }
+    };
   });
 }
