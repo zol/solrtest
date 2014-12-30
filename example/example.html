@@ -24,9 +24,9 @@
 
   <h3>Results ({{results.length}})</h3>
     {{#each results}}
-      <dl>
-        <dt>Title</dt>
-        <dd>{{title_t}}</dd>
-      </dl>
+      <div>
+        <div><em>Name</em> {{title_t}}</div>
+        <div><em>Description</em> {{description_t}}</div>
+      </div><br/>
     {{/each}}
 </template>

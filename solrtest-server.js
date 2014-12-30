@@ -16,7 +16,17 @@ function logged(result) {
 
 Meteor.methods({
   'Solrtest.query': function(q) {
-    var query = Solrtest.client.createQuery().q({title_t : q}).start(0).rows(100);
+    // lucene query
+    // var query = Solrtest.client.createQuery().q({title_t : q}).start(0).rows(100);
+    
+    // dismax query
+    var query = Solrtest.client.createQuery().q(q)
+                .edismax()
+                .qf({title_t : 3.0 , description_t : 0.5})
+                .mm(2) // not sure what this means
+                .start(0)
+                .rows(100);
+          
     return logged(Solrtest.wrapped['search'](query));
   },
   'Solrtest.deleteAll': function() {
