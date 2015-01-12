@@ -81,7 +81,9 @@
    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
         
    <field name="name" type="text_ngrm" indexed="true" stored="true"/>
-   <field name="description" type="string" indexed="false" stored="true"/>
+   <field name="description" type="text_ngrm" indexed="true" stored="true"/>
+   <field name="atscore" type="float" indexed="true" stored="true" default="0.0"/>
+   <field name="hidden" type="boolean" indexed="true" stored="true" default="false"/>
 
   <solrQueryParser defaultOperator="AND"/>
 
@@ -91,7 +93,7 @@
         <tokenizer class="solr.WhitespaceTokenizerFactory"/>
         <!--tokenizer class="solr.StandardTokenizerFactory"/-->
         <filter class="solr.LowerCaseFilterFactory"/>
-        <filter class="solr.NGramFilterFactory" minGramSize="3" maxGramSize="25"/>
+        <filter class="solr.NGramFilterFactory" minGramSize="1" maxGramSize="25"/>
       </analyzer>
       
       <analyzer type="query">

@@ -71,7 +71,9 @@ if (Meteor.isServer) {
         return {
           id: x.name,
           name: x.name,
-          description: x.latestVersion ? x.latestVersion.description : ''
+          description: x.latestVersion ? x.latestVersion.description : '',
+          atscore: x.score,
+          hidden: x.latestVersion ? x.latestVersion.unmigrated : false
         }
       });
 

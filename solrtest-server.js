@@ -23,12 +23,15 @@ Meteor.methods({
   'Solrtest.query': function(q) {
     // lucene query
     // var query = Solrtest.client.createQuery().q({name : q}).start(0).rows(100);
+    q = escape(q);
+    q += ' hidden:false'; //only show results that aren't 'hidden'
     
     // edismax query
-    var query = Solrtest.client.createQuery().q(escape(q))
+    var query = Solrtest.client.createQuery().q(q)
                 .edismax()
-                .qf({name : 1.0})
-                // .mm(2) // not sure what this means
+                .qf({name : 1.0, description: 0.3})
+                .sort({atscore: 'desc'})
+                .mm(2) // at least two terms are mandatory
                 .start(0)
                 .rows(100);
 
